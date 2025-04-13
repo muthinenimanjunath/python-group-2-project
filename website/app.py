@@ -19,7 +19,7 @@ def index():
 def show_data():
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM retail_sales")  # Adjust limit as needed
+    cursor.execute("SELECT * FROM retail_sales LIMIT 100000")  # Adjust limit as needed
     rows = cursor.fetchall()
     conn.close()
     return render_template('data.html', rows=rows)
@@ -27,29 +27,40 @@ def show_data():
 # Add new data form
 @app.route('/add_data')
 def add_data():
-    return render_template('add_data.html')
+    return render_template('add_data.html', success=False, latest=None)
 
 # Add new data to the database
 @app.route('/add', methods=['POST'])
 def add_record():
     if request.method == 'POST':
-        InvoiceNo = request.form['InvoiceNo'] #Text
-        StockCode = request.form['StockCode'] #Text
-        Description = request.form['Description'] #Text
-        Quantity = request.form['Quantity'] #Integer
-        InvoiceDate = request.form['InvoiceDate'] #Text (datetime string) YYYY-MM-DD HH:MM:SS
-        UnitPrice = request.form['UnitPrice'] #Real (float)
-        CustomerID = request.form['CustomerID'] #Integer
-        Country = request.form['Country'] #Integer (encoded as category)
+        InvoiceNo = request.form['InvoiceNo']
+        StockCode = request.form['StockCode']
+        Description = request.form['Description']
+        Quantity = request.form['Quantity']
+        InvoiceDate = request.form['InvoiceDate']
+        UnitPrice = request.form['UnitPrice']
+        CustomerID = request.form['CustomerID']
+        Country = request.form['Country']
+
         conn = create_connection()
         cursor = conn.cursor()
+
         cursor.execute('''
             INSERT INTO retail_sales (InvoiceNo, StockCode, Description, Quantity, InvoiceDate, UnitPrice, CustomerID, Country)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)''', 
-            (InvoiceNo, StockCode, Description, Quantity, InvoiceDate, UnitPrice, CustomerID, Country))
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (InvoiceNo, StockCode, Description, Quantity, InvoiceDate, UnitPrice, CustomerID, Country))
+
         conn.commit()
+
+        # Fetch the latest record just inserted
+        cursor.execute("SELECT * FROM retail_sales ORDER BY rowid DESC LIMIT 1")
+        latest = cursor.fetchone()
+
         conn.close()
-        return redirect(url_for('show_data'))
+
+        # Return to the form page with success message and latest entry
+        return render_template('add_data.html', success=True, latest=latest)
+
 # About page
 @app.route('/about')
 def about():
