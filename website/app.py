@@ -14,15 +14,29 @@ def create_connection():
 def index():
     return render_template('index.html')
 
-# Data route to show records
-@app.route('/data')
+# Data route to show records with optional search
+@app.route('/data', methods=['GET', 'POST'])
 def show_data():
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM retail_sales LIMIT 100000")  # Adjust limit as needed
+    
+    # Get the search query from the form (if any)
+    search_query = request.args.get('search_query')
+    
+    # If there's a search query, filter the records
+    if search_query:
+        cursor.execute("""
+            SELECT * FROM retail_sales 
+            WHERE InvoiceNo LIKE ? OR StockCode LIKE ? OR Description LIKE ? OR Country LIKE ?
+        """, ('%' + search_query + '%', '%' + search_query + '%', '%' + search_query + '%', '%' + search_query + '%'))
+    else:
+        # Otherwise, show all records
+        cursor.execute("SELECT * FROM retail_sales LIMIT 100000")  # Adjust limit as needed
+    
     rows = cursor.fetchall()
     conn.close()
-    return render_template('data.html', rows=rows)
+    return render_template('data.html', rows=rows, search_query=search_query)
+
 
 # Add new data form
 @app.route('/add_data')
