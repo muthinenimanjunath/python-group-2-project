@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data</title>
+</head>
+<body>
+    <h1>Retail Sales Data</h1>
+    <table border="1">
+        <tr>
+            <th>InvoiceNo</th>
+            <th>StockCode</th>
+            <th>Description</th>
+            <th>Quantity</th>
+            <th>InvoiceDate</th>
+            <th>UnitPrice</th>
+            <th>CustomerID</th>
+            <th>Country</th>
+        </tr>
+        {% for row in rows %}
+        <tr>
+            <td>{{ row['InvoiceNo'] }}</td>
+            <td>{{ row['StockCode'] }}</td>
+            <td>{{ row['Description'] }}</td>
+            <td>{{ row['Quantity'] }}</td>
+            <td>{{ row['InvoiceDate'] }}</td>
+            <td>{{ row['UnitPrice'] }}</td>
+            <td>{{ row['CustomerID'] }}</td>
+            <td>{{ row['Country'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

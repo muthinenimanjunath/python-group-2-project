@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add New Data</title>
+</head>
+<body>
+    <h1>Add New Record</h1>
+    <form action="/add" method="post">
+        <label>InvoiceNo:</label><input type="text" name="InvoiceNo" required><br>
+        <label>StockCode:</label><input type="text" name="StockCode" required><br>
+        <label>Description:</label><input type="text" name="Description" required><br>
+        <label>Quantity:</label><input type="number" name="Quantity" required><br>
+        <label>InvoiceDate:</label><input type="text" name="InvoiceDate" required><br>
+        <label>UnitPrice:</label><input type="number" name="UnitPrice"  step="0.01"><br>
+        <label>CustomerID:</label><input type="number" name="CustomerID" required><br>
+        <label>Country:</label><input type="text" name="Country" required><br>
+        <button type="submit">Add Record</button>
+    </form>
+</body>
+</html>
