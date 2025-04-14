@@ -71,7 +71,6 @@ group-2-project/
    Once the data is set up, navigate to the `website` folder and run the Flask server with the following command:
 
    ```bash
-   cd website
    python app.py
    ```
 
