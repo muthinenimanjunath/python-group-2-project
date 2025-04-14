@@ -1,13 +1,23 @@
 from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
+import os
+from pathlib import Path
 
 app = Flask(__name__)
 
 # Database connection
 def create_connection():
-    conn = sqlite3.connect('database/retail_sales.db')
-    conn.row_factory = sqlite3.Row
-    return conn
+    # Get the absolute path of the database file
+    db_path = Path(__file__).resolve().parent.parent / 'database/retail_sales.db'
+    print(f"Database absolute path: {db_path}") 
+    
+    try:
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        return conn
+    except sqlite3.OperationalError as e:
+        print(f"Error connecting to database: {e}")
+        return None
 
 # Home route
 @app.route('/')
@@ -18,6 +28,9 @@ def index():
 @app.route('/data', methods=['GET', 'POST'])
 def show_data():
     conn = create_connection()
+    if conn is None:
+        return "Database connection failed", 500
+
     cursor = conn.cursor()
     
     # Get the search query from the form (if any)
@@ -47,6 +60,7 @@ def add_data():
 @app.route('/add', methods=['POST'])
 def add_record():
     if request.method == 'POST':
+        # Get data from the form
         InvoiceNo = request.form['InvoiceNo']
         StockCode = request.form['StockCode']
         Description = request.form['Description']
@@ -56,9 +70,14 @@ def add_record():
         CustomerID = request.form['CustomerID']
         Country = request.form['Country']
 
+        # Connect to the database
         conn = create_connection()
+        if conn is None:
+            return "Database connection failed", 500
+        
         cursor = conn.cursor()
 
+        # Insert data into the database
         cursor.execute('''
             INSERT INTO retail_sales (InvoiceNo, StockCode, Description, Quantity, InvoiceDate, UnitPrice, CustomerID, Country)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -79,5 +98,6 @@ def add_record():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
